@@ -13,6 +13,29 @@ export interface UseMidnightResult {
   isConnected: boolean;
 }
 
+/**
+ * Turns a thrown wallet/provider error into a short, human-friendly message so
+ * the UI can distinguish the three common failure modes:
+ *   - wallet not installed        -> "no-wallet" state
+ *   - user rejected the request   -> "Request rejected"
+ *   - network mismatch            -> explicit network guidance
+ */
+function classifyConnectError(err: unknown, raw: string): string {
+  const text = `${raw} ${err instanceof Error ? err.message : ''}`.toLowerCase();
+  if (text.includes('reject') || text.includes('denied') || text.includes('user canceled') || text.includes('cancel')) {
+    return 'Connection request rejected in the wallet. Click Connect Wallet to try again.';
+  }
+  if (
+    text.includes('network') ||
+    text.includes('networks') ||
+    text.includes('not found') ||
+    text.includes('connect') && (text.includes('network') || text.includes('networkid'))
+  ) {
+    return 'Network mismatch. Select the Preview network in your Midnight Wallet and try again.';
+  }
+  return raw;
+}
+
 export function useMidnight(contractAddress: string | null): UseMidnightResult {
   const [state, setState] = useState<ConnectionState>('idle');
   const [deployed, setDeployed] = useState<DaoDeployment | null>(getCachedDeployment());
@@ -48,7 +71,7 @@ export function useMidnight(contractAddress: string | null): UseMidnightResult {
       setState('connected');
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      setError(msg);
+      setError(classifyConnectError(e, msg));
       setState((window as unknown as { midnight?: unknown }).midnight == null ? 'no-wallet' : 'error');
     }
   }, []);

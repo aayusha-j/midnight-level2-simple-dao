@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import WalletConnect from './components/WalletConnect';
+import CircuitCall from './components/CircuitCall';
 import SubmitProposal from './components/SubmitProposal';
 import ProposalCard from './components/ProposalCard';
 import { useMidnight } from './hooks/useMidnight';
@@ -116,6 +117,8 @@ export default function App() {
           <p className="privacy-note">Proved without revealing your input.</p>
         </section>
       )}
+
+      <CircuitCall deployed={midnight.deployed} />
 
       <div className="content-grid">
         <SubmitProposal
