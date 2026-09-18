@@ -36,7 +36,19 @@ This makes it possible to have a transparent and verifiable DAO while still prot
 - **Deployed contract address:** `48bd1323473b73840cd8474f36fb58051cb50f52413f733f43ec334588005c9f`
 - **Deployer wallet address:** `mn_addr_preview1k9elxqmx6qwf34wqm29nzhrmavp7v50qn4scafv2778q8430zrrqhe238y`
 
+## Live Demo
 
+[https://midnight-level2-simple-dao-app.vercel.app/](https://midnight-level2-simple-dao-app.vercel.app/)
+
+Connect a Midnight-compatible wallet (Lace or 1AM) on the **Preview** network to interact with it live.
+
+## Privacy Claim
+
+Anyone watching the Midnight blockchain can see that a wallet registered as a DAO member, that a spending proposal was submitted (its title, amount, and recipient), and the running tally of yes/no votes. What they **cannot** see: which specific address cast which vote, or the membership secret used to register — only a zero-knowledge commitment to it is ever recorded on-chain. Governance stays anonymous while remaining fully auditable.
+
+## Demo Video
+
+[PASTE YOUR VIDEO LINK HERE AFTER RECORDING]
 
 ## Key Features
 
