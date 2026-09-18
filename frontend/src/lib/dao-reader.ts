@@ -1,7 +1,7 @@
 import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { getNetworkId, setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 import { ledger } from '../../../contracts/managed/simple-dao/contract/index.js';
-import { type Proposal, statusToLabel } from './dao-types';
+import { type Proposal, statusToLabel, bytesToHex } from './dao-types';
 
 const DEFAULT_INDEXER = 'https://indexer.preview.midnight.network/api/v4/graphql';
 const DEFAULT_INDEXER_WS = 'wss://indexer.preview.midnight.network/api/v4/graphql/ws';
@@ -43,7 +43,7 @@ export function createDaoReader(contractAddress: string) {
           yes: raw.yes,
           no: raw.no,
           status: statusToLabel(raw.status),
-          recipientsHex: Array.from(raw.recipient, (b) => b.toString(16).padStart(2, '0')).join(''),
+          recipientsHex: bytesToHex(raw.recipient),
         });
       }
       return proposals.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));

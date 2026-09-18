@@ -113,21 +113,129 @@ export async function connectAndFindContract(contractAddress: string): Promise<D
   }
 
   const wallet = await waitForWallet();
-  const connected = await wallet.connect((import.meta.env.VITE_DAO_NETWORK_ID as string | undefined) ?? 'preview');
-  const config = await connected.getConfiguration();
-  setNetworkId(config.networkId);
+  const networkId = (import.meta.env.VITE_DAO_NETWORK_ID as string | undefined) ?? 'preview';
 
-  const { unshieldedAddress } = await connected.getUnshieldedAddress();
-  const shielded = await connected.getShieldedAddresses();
+  console.group('[connectAndFindContract] Calling wallet.connect()');
+  console.log('networkId arg:', networkId);
+  console.log('wallet object keys:', wallet ? Object.keys(wallet) : 'null/undefined');
+  console.log('typeof wallet.connect:', typeof wallet.connect);
+  console.log('wallet.apiVersion:', (wallet as Record<string, unknown>).apiVersion);
 
-  const zkConfigProvider = new FetchZkConfigProvider<DaoCircuitKeys>(`${window.location.origin}/zk/simple-dao`);
-  const proofProvider = httpClientProofProvider(
-    config.proverServerUri ?? (import.meta.env.VITE_DAO_PROOF_SERVER as string | undefined) ?? '',
-    zkConfigProvider,
-  );
-  const publicDataProvider = indexerPublicDataProvider(config.indexerUri, config.indexerWsUri);
+  let connected;
+  try {
+    connected = await wallet.connect(networkId);
+    console.log('wallet.connect() succeeded:', connected);
+  } catch (err) {
+    console.error('[connectAndFindContract] wallet.connect() THREW:', err);
+    console.error('[connectAndFindContract] error type:', typeof err);
+    console.error('[connectAndFindContract] error constructor:', err?.constructor?.name);
+    console.error('[connectAndFindContract] error prototype chain:', Object.getPrototypeOf(err)?.constructor?.name);
 
-  const providers = {
+    if (err instanceof Error) {
+      console.error('[connectAndFindContract] name:', err.name);
+      console.error('[connectAndFindContract] message:', err.message);
+      console.error('[connectAndFindContract] stack:', err.stack);
+      if ('cause' in err) console.error('[connectAndFindContract] cause:', (err as { cause: unknown }).cause);
+    }
+
+    try {
+      console.error('[connectAndFindContract] error serialized:', JSON.stringify(err, Object.getOwnPropertyNames(err ?? {})));
+    } catch (serErr) {
+      console.error('[connectAndFindContract] error NOT serializable:', serErr);
+    }
+
+    for (const key of Object.getOwnPropertyNames(err ?? {})) {
+      console.error(`[connectAndFindContract] err.${key}:`, (err as Record<string, unknown>)[key]);
+    }
+
+    console.groupEnd();
+    throw err;
+  }
+
+  console.log('wallet.connect() result keys:', connected ? Object.keys(connected) : 'null/undefined');
+  console.groupEnd();
+
+  console.group('[connectAndFindContract] post-connect steps');
+
+  let config;
+  try {
+    console.log('[step 1] calling connected.getConfiguration()...');
+    config = await connected.getConfiguration();
+    console.log('[step 1] getConfiguration() succeeded:', config);
+  } catch (err) {
+    console.error('[step 1] getConfiguration() THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  try {
+    console.log('[step 2] calling setNetworkId(', config.networkId, ')...');
+    setNetworkId(config.networkId);
+    console.log('[step 2] setNetworkId() succeeded');
+  } catch (err) {
+    console.error('[step 2] setNetworkId() THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  let unshieldedAddress: string;
+  try {
+    console.log('[step 3] calling connected.getUnshieldedAddress()...');
+    unshieldedAddress = (await connected.getUnshieldedAddress()).unshieldedAddress;
+    console.log('[step 3] getUnshieldedAddress() succeeded:', unshieldedAddress);
+  } catch (err) {
+    console.error('[step 3] getUnshieldedAddress() THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  let shielded: Awaited<ReturnType<typeof connected.getShieldedAddresses>>;
+  try {
+    console.log('[step 4] calling connected.getShieldedAddresses()...');
+    shielded = await connected.getShieldedAddresses();
+    console.log('[step 4] getShieldedAddresses() succeeded, keys:', shielded ? Object.keys(shielded) : 'null/undefined');
+  } catch (err) {
+    console.error('[step 4] getShieldedAddresses() THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  let zkConfigProvider: FetchZkConfigProvider<DaoCircuitKeys>;
+  try {
+    console.log('[step 5] constructing FetchZkConfigProvider...');
+    zkConfigProvider = new FetchZkConfigProvider<DaoCircuitKeys>(`${window.location.origin}/zk/simple-dao`);
+    console.log('[step 5] FetchZkConfigProvider constructed');
+  } catch (err) {
+    console.error('[step 5] FetchZkConfigProvider constructor THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  let proofProvider: ReturnType<typeof httpClientProofProvider>;
+  try {
+    const proverServerUri =
+      config.proverServerUri ?? (import.meta.env.VITE_DAO_PROOF_SERVER as string | undefined) ?? '';
+    console.log('[step 6] calling httpClientProofProvider() with proverServerUri:', proverServerUri);
+    proofProvider = httpClientProofProvider(proverServerUri, zkConfigProvider);
+    console.log('[step 6] httpClientProofProvider() succeeded');
+  } catch (err) {
+    console.error('[step 6] httpClientProofProvider() THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  let publicDataProvider: ReturnType<typeof indexerPublicDataProvider>;
+  try {
+    console.log('[step 7] calling indexerPublicDataProvider() with indexerUri:', config.indexerUri, 'indexerWsUri:', config.indexerWsUri);
+    publicDataProvider = indexerPublicDataProvider(config.indexerUri, config.indexerWsUri);
+    console.log('[step 7] indexerPublicDataProvider() succeeded');
+  } catch (err) {
+    console.error('[step 7] indexerPublicDataProvider() THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  const buildProviders = () => ({
     privateStateProvider: new InMemoryPrivateStateProvider<string, Record<string, never>>(),
     publicDataProvider,
     zkConfigProvider,
@@ -151,25 +259,56 @@ export async function connectAndFindContract(contractAddress: string): Promise<D
         return tx.identifiers()[0];
       },
     },
-  };
+  });
 
-  const compiledContract = CompiledContract.make(
-    'SimpleDAO',
-    // The engine-generated Contract class shape differs slightly from compact-js's
-    // `Contract` type parameter defaults; numeric context is all that matters here.
-    SimpleDaoContract as unknown as never,
-  ).pipe(CompiledContract.withVacantWitnesses);
+  let providers: ReturnType<typeof buildProviders>;
+  try {
+    console.log('[step 8] constructing providers object (walletProvider/midnightProvider closures)...');
+    providers = buildProviders();
+    console.log('[step 8] providers object constructed');
+  } catch (err) {
+    console.error('[step 8] providers object construction THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
 
-  // `findDeployedContract` returns a richly typed contract wrapper; we narrow it
-  // through an `any` boundary into the small surface the UI uses.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const deployed = (await findDeployedContract(providers as any, {
-    compiledContract: compiledContract as never,
-    contractAddress,
-    initialPrivateState: {},
-    privateStateId: PRIVATE_STATE_ID,
+  let compiledContract;
+  try {
+    console.log('[step 9] calling CompiledContract.make()...');
+    compiledContract = CompiledContract.make(
+      'SimpleDAO',
+      // The engine-generated Contract class shape differs slightly from compact-js's
+      // `Contract` type parameter defaults; numeric context is all that matters here.
+      SimpleDaoContract as unknown as never,
+    ).pipe(CompiledContract.withVacantWitnesses);
+    console.log('[step 9] CompiledContract.make() succeeded');
+  } catch (err) {
+    console.error('[step 9] CompiledContract.make() THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  let deployed: any;
+  try {
+    console.log('[step 10] calling findDeployedContract() with contractAddress:', contractAddress, '...');
+    // `findDeployedContract` returns a richly typed contract wrapper; we narrow it
+    // through an `any` boundary into the small surface the UI uses.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any)) as any;
+    deployed = (await findDeployedContract(providers as any, {
+      compiledContract: compiledContract as never,
+      contractAddress,
+      initialPrivateState: {},
+      privateStateId: PRIVATE_STATE_ID,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)) as any;
+    console.log('[step 10] findDeployedContract() succeeded');
+  } catch (err) {
+    console.error('[step 10] findDeployedContract() THREW:', err, '| constructor:', err?.constructor?.name, '| message:', (err as Error)?.message);
+    console.groupEnd();
+    throw err;
+  }
+
+  console.groupEnd();
 
   const readState = async (): Promise<Ledger | null> => {
     const state = await publicDataProvider.queryContractState(contractAddress);

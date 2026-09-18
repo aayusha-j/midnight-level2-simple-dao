@@ -5,16 +5,16 @@ import topLevelAwait from 'vite-plugin-top-level-await';
 
 export default defineConfig({
   cacheDir: './.vite',
+  resolve: {
+    dedupe: [
+      '@midnight-ntwrk/compact-runtime',
+      '@midnight-ntwrk/onchain-runtime-v3',
+      '@midnight-ntwrk/ledger-v8',
+    ],
+  },
   build: {
     target: 'es2022',
     minify: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          wasm: ['@midnight-ntwrk/onchain-runtime-v3'],
-        },
-      },
-    },
     commonjsOptions: {
       transformMixedEsModules: true,
       extensions: ['.js', '.cjs'],
@@ -28,19 +28,6 @@ export default defineConfig({
       promiseExportName: '__tla',
       promiseImportName: (i) => `__tla_${i}`,
     }),
-    {
-      name: 'wasm-module-resolver',
-      resolveId(source, importer) {
-        if (
-          source === '@midnight-ntwrk/onchain-runtime-v3' &&
-          importer &&
-          importer.includes('@midnight-ntwrk/compact-runtime')
-        ) {
-          return { id: source, external: false, moduleSideEffects: true };
-        }
-        return null;
-      },
-    },
   ],
   optimizeDeps: {
     esbuildOptions: {
@@ -55,6 +42,9 @@ export default defineConfig({
       '@midnight-ntwrk/onchain-runtime-v3',
       '@midnight-ntwrk/onchain-runtime-v3/midnight_onchain_runtime_wasm_bg.js',
       '@midnight-ntwrk/onchain-runtime-v3/midnight_onchain_runtime_wasm_bg.wasm',
+      '@midnight-ntwrk/ledger-v8',
+      '@midnight-ntwrk/ledger-v8/midnight_ledger_wasm_bg.js',
+      '@midnight-ntwrk/ledger-v8/midnight_ledger_wasm_bg.wasm',
     ],
   },
   define: {
