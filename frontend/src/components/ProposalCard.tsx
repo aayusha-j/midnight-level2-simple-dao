@@ -53,7 +53,7 @@ export default function ProposalCard({
   };
 
   return (
-    <div className="card proposal">
+    <div className="card proposal proposal-enter">
       <div className="proposal-header">
         <div>
           <h3>
