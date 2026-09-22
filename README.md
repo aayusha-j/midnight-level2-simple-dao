@@ -1,5 +1,7 @@
 # Simple DAO — Midnight Network
 
+![Network](https://img.shields.io/badge/network-Midnight%20Preview-8b5cf6) ![Language](https://img.shields.io/badge/contract-Compact-6366f1) ![License](https://img.shields.io/badge/license-MIT-green) ![Tests](https://img.shields.io/badge/tests-9%20passing-brightgreen)
+
 A governance system where token holders can submit proposals and vote on how to spend a shared treasury. Once a voting threshold (quorum) and deadline are met, approved proposals are automatically executed and funds are released — while every individual ballot stays private.
 
 ## Project Vision
