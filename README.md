@@ -48,7 +48,7 @@ Anyone watching the Midnight blockchain can see that a wallet registered as a DA
 
 ## Demo Video
 
-[PASTE YOUR VIDEO LINK HERE AFTER RECORDING]
+[https://youtu.be/5yk1Cb8KFnM?si=LuaIrbbxnFG3yb6l]
 
 ## Key Features
 
