@@ -183,6 +183,12 @@ The test suite completed successfully with 9 passing tests covering circuit logi
 
 ![Test Results](screenshots/tests.png)
 
+### Level 3 — Full Test Suite (9 Passing)
+
+Level 3 submission: all 9 tests passing, covering circuit logic, state transitions, and the private-inputs-never-exposed guarantee.
+
+![Level 3 Test Output](screenshots/level3-tests.png)
+
 ### Hosting
 
 `frontend/vercel.json` and `frontend/netlify.toml` (+ `public/_redirects`) provide SPA rewrites for Vercel and Netlify deploys.
