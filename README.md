@@ -52,7 +52,9 @@ Anyone watching the Midnight blockchain can see that a wallet registered as a DA
 
 ## Demo Video
 
-[https://youtu.be/5yk1Cb8KFnM?si=LuaIrbbxnFG3yb6l]
+[https://youtube.com/shorts/AqpnNYozGSU?si=TE-sGV9aKbTrcqe6](https://youtube.com/shorts/AqpnNYozGSU?si=TE-sGV9aKbTrcqe6)
+
+**Level 3 update:** This video demonstrates the full dApp flow (wallet connect → proof generation → proposal submission → private vote), the passing CI pipeline, and the terminal output of all 9 tests.
 
 ## Key Features
 
