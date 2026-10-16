@@ -232,7 +232,7 @@ Everything the DAO needs to be auditable is public: proposals, the treasury, mem
 | Demo video | [PASTE LEVEL 4 VIDEO LINK] |
 | CI/CD | [GitHub Actions workflow](.github/workflows/ci.yml) (badge at top of this README) |
 | Usage guide | [docs/USAGE.md](docs/USAGE.md) |
-| Product X profile | [PASTE X PROFILE LINK] |
+| Product X profile | https://x.com/AayushaJagtap |
 
 **Network note:** Level 4 accepts Preprod or Preview, and this MVP is deployed and verifiable on Preview. I tried Preprod first, but Midnight retired its hosted Preprod indexer and RPC on 9 October 2026 and moved Preprod to Blockfrost-hosted endpoints that need a project token. I plan to move the app to Preprod for Level 5.
 
@@ -267,4 +267,4 @@ Step-by-step instructions for non-technical users are in [docs/USAGE.md](docs/US
 
 ## Product X Profile
 
-[PASTE X PROFILE LINK]
+https://x.com/AayushaJagtap
