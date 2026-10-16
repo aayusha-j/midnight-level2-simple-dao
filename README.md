@@ -221,3 +221,50 @@ When voting, the member can also prove that a valid vote was made without reveal
 ## Privacy in plain English
 
 Everything the DAO needs to be auditable is public: proposals, the treasury, member *commitments* (hashes) and vote *nullifiers*. Everything that would identify a person or their ballot is private: the 32-byte membership credential and the yes/no choice. Those secrets exist only inside a zero-knowledge proof, generated in your browser, used once, and discarded. The chain — and anyone watching it — learns *that* a registered member voted on proposal N and *that* the aggregate tally moved by one. It never learns *who* or *which way*.
+
+## Level 4 Submission
+
+| Item | Link / Detail |
+|------|---------------|
+| Network | Midnight Preview (see note below) |
+| Contract address | `48bd1323473b73840cd8474f36fb58051cb50f52413f733f43ec334588005c9f` |
+| Live demo | https://midnight-level2-simple-dao-app.vercel.app/ |
+| Demo video | [PASTE LEVEL 4 VIDEO LINK] |
+| CI/CD | [GitHub Actions workflow](.github/workflows/ci.yml) (badge at top of this README) |
+| Usage guide | [docs/USAGE.md](docs/USAGE.md) |
+| Product X profile | [PASTE X PROFILE LINK] |
+
+**Network note:** Level 4 accepts Preprod or Preview, and this MVP is deployed and verifiable on Preview. I tried Preprod first, but Midnight retired its hosted Preprod indexer and RPC on 9 October 2026 and moved Preprod to Blockfrost-hosted endpoints that need a project token. I plan to move the app to Preprod for Level 5.
+
+## Architecture
+
+```
+  Member's browser                                   Midnight Preview
+ ┌─────────────────────┐   connect / approve tx   ┌───────────────────┐
+ │ React + Vite dApp   │ ───────────────────────► │ 1AM / Lace wallet │
+ │ (Vercel)            │ ◄─────────────────────── │ (DApp Connector)  │
+ └─────────┬───────────┘      signed + proven     └─────────┬─────────┘
+           │                                                │ submit tx
+           │ read state (treasury, members,                 ▼
+           │ proposals, tallies)                  ┌───────────────────┐
+           │                                      │ Midnight node     │
+           ▼                                      │ + Simple DAO      │
+ ┌─────────────────────┐   indexes chain data     │ Compact contract  │
+ │ Midnight indexer    │ ◄─────────────────────── └───────────────────┘
+ └─────────────────────┘
+
+ Private witness (credential, yes/no choice) -> ZK proof made for the transaction
+ -> only commitments, nullifiers and tallies reach the public ledger.
+```
+
+## CI/CD
+
+A GitHub Actions workflow runs on every push and pull request to `main`. It installs Node 22, installs the Compact toolchain pinned to the Preview-compatible compiler, compiles the contract, runs the Vitest suite (9 tests, including a check that private inputs never appear in ledger output), and builds the frontend.
+
+## Usage Guide
+
+Step-by-step instructions for non-technical users are in [docs/USAGE.md](docs/USAGE.md).
+
+## Product X Profile
+
+[PASTE X PROFILE LINK]
